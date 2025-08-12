@@ -100,7 +100,7 @@ TEMPLATES = [
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default=env('db_url'),
+        default='postgresql://gameplandb_user:Z1swEXXrpTLx78DhZr9Vlyf2ow1T8en7@dpg-d2dpapbipnbc739dm540-a.oregon-postgres.render.com/gameplandb',
         conn_max_age=600
     )
 }
