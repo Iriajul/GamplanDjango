@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'payments',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://gamplandjango-2.onrender.com"
+]
 # Middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Added cors middleware here
