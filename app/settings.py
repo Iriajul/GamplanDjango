@@ -16,7 +16,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Core settings
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+ALLOWED_HOSTS = ["*"]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
