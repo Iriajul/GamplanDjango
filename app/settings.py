@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 import environ
+import dj_database_url 
 
 # Initialize environ
 env = environ.Env(
@@ -83,18 +84,25 @@ TEMPLATES = [
 ]
 
 # Database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': env('DB_ENGINE'),
+#         'NAME': env('DB_NAME'),
+#         'USER': env('DB_USER'),
+#         'PASSWORD': env('DB_PASSWORD'),
+#         'HOST': env('DB_HOST'),
+#         'PORT': env('DB_PORT'),
+#         'OPTIONS': {
+#             'options': '-c search_path=django'
+#         }
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
-        'OPTIONS': {
-            'options': '-c search_path=django'
-        }
-    }
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default=env('db_url'),
+        conn_max_age=600
+    )
 }
 
 # Custom user model
