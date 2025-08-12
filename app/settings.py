@@ -97,13 +97,15 @@ TEMPLATES = [
 #         }
 #     }
 # }
+
 DATABASES = {
     'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgresql://gameplandb_user:Z1swEXXrpTLx78DhZr9Vlyf2ow1T8en7@dpg-d2dpapbipnbc739dm540-a.oregon-postgres.render.com/gameplandb',
-        conn_max_age=600
+        default='postgresql://game_ob55_user:TV7YOJcvQurBCRRLRqlm2x3F5CJHX79x@dpg-d2dpvvbuibrs73afvrp0-a.oregon-postgres.render.com/game_ob55',
+        conn_max_age=600,
+        ssl_require=True
     )
 }
+
 
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
