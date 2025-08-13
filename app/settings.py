@@ -43,8 +43,9 @@ INSTALLED_APPS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gamplandjango-2.onrender.com",
-    "https://gameplan-demo.vercel.app/login"
+    "https://gameplan-demo.vercel.app"
 ]
+
 # Middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Added cors middleware here
@@ -102,6 +103,11 @@ TEMPLATES = [
 #         }
 #     }
 # }
+
+# Login / Logout redirects (for session-based login)
+LOGIN_REDIRECT_URL = env('FRONTEND_DOMAIN') + "/login"
+LOGOUT_REDIRECT_URL = env('FRONTEND_DOMAIN') + "/login"
+
 
 DATABASES = {
     'default': dj_database_url.config(
