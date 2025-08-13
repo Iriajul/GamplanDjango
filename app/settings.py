@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gamplandjango-2.onrender.com",
-    "https://gameplan-demo.vercel.app/"
+    "https://gameplan-demo.vercel.app"
 ]
 
 # Middleware
@@ -173,8 +173,9 @@ GOOGLE_API_KEY = env('GOOGLE_API_KEY')
 TAVILY_API_KEY = env('TAVILY_API_KEY')
 
 # CORS settings
+
 CORS_ALLOWED_ORIGINS = [
-    "https://gameplan-demo.vercel.app/"
+    "https://gameplan-demo.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
