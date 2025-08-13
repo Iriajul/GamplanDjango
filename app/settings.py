@@ -174,7 +174,7 @@ TAVILY_API_KEY = env('TAVILY_API_KEY')
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_DOMAIN,
+    "https://gameplan-demo.vercel.app/"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
