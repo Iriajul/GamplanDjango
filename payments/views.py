@@ -51,8 +51,8 @@ class CreateCheckoutSessionView(APIView):
                     'quantity': 1,
                 }],
                 mode='subscription',
-                success_url=settings.FRONTEND_DOMAIN + '/payment-success?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url=settings.FRONTEND_DOMAIN + '/payment-cancel',
+                success_url=settings.FRONTEND_DOMAIN + '/dashboard',
+                cancel_url=settings.FRONTEND_DOMAIN + '/pricing',
             )
             return Response({'checkout_url': checkout_session.url})
 
