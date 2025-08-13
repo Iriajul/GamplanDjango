@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gamplandjango-2.onrender.com",
-    "https://gameplan-demo.vercel.app"
+    "https://gameplan-demo.vercel.app/"
 ]
 
 # Middleware
