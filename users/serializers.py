@@ -103,24 +103,19 @@ class SetNewPasswordSerializer(serializers.Serializer):
     
 # User profile serializers    
 class UserProfileSerializer(serializers.ModelSerializer):
-    """For viewing profile info"""
+    """For viewing profile info with full CDN URL"""
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['username', 'email', 'about', 'account_type', 'profile_picture']  
         read_only_fields = ['email', 'account_type']
 
-# Update user profile fields
-class UserUpdateSerializer(serializers.ModelSerializer):
-    """For updating profile fields"""
-    class Meta:
-        model = User
-        fields = ['username', 'about', 'profile_picture']
-        extra_kwargs = {
-            'username': {'required': False},
-            'about': {'required': False},
-            'profile_picture': {'required': False},
-        }
-
+    def get_profile_picture(self, obj):
+        if obj.profile_picture:
+            # Prepend BunnyCDN URL
+            return f"{settings.BUNNY_CDN_URL}/{obj.profile_picture}"
+        return None
 # Serializer for updating about and details fields
 class AboutDetailsSerializer(serializers.ModelSerializer):
     """For popup about/details editing only"""
@@ -131,3 +126,21 @@ class AboutDetailsSerializer(serializers.ModelSerializer):
             'about': {'required': False},
             'details': {'required': False},
         }
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """For updating profile fields"""
+    class Meta:
+        model = User
+        fields = ['username', 'about', 'profile_picture']
+        extra_kwargs = {
+            'username': {'required': False},
+            'about': {'required': False},
+            'profile_picture': {'required': False},
+        }
+    
+    # Prepend BunnyCDN URL when updating profile_picture
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.profile_picture:
+            data['profile_picture'] = f"{settings.BUNNY_CDN_URL}/{instance.profile_picture}"
+        return data        
