@@ -139,7 +139,13 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
-        serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
+        # Include request.FILES for image upload
+        serializer = UserUpdateSerializer(
+            request.user, 
+            data=request.data, 
+            partial=True,
+            context={'request': request}  # optional, in case serializer needs request
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

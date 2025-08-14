@@ -116,6 +116,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             # Prepend BunnyCDN URL
             return f"{settings.BUNNY_CDN_URL}/{obj.profile_picture}"
         return None
+    
 # Serializer for updating about and details fields
 class AboutDetailsSerializer(serializers.ModelSerializer):
     """For popup about/details editing only"""
