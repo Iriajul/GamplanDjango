@@ -139,18 +139,14 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
-        # Include request.FILES for image upload
         serializer = UserUpdateSerializer(
-            request.user, 
-            data=request.data, 
-            partial=True,
-            context={'request': request}  # optional, in case serializer needs request
+            request.user, data=request.data, partial=True
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
 # About/Details update
 class AboutDetailsUpdateView(APIView):
     permission_classes = [IsAuthenticated]
