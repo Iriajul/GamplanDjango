@@ -18,8 +18,8 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ["*"]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
 
 # Installed apps
 INSTALLED_APPS = [
@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',  # Added corsheaders here
-
+    'storages',  # For BunnyCDN storage
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'users',
@@ -171,6 +171,18 @@ BACKEND_DOMAIN = env('BACKEND_DOMAIN')
 # External APIs
 GOOGLE_API_KEY = env('GOOGLE_API_KEY')
 TAVILY_API_KEY = env('TAVILY_API_KEY')
+
+# BunnyCDN Storage
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+AWS_ACCESS_KEY_ID = env("BUNNY_STORAGE_USERNAME")  
+AWS_SECRET_ACCESS_KEY = env("BUNNY_STORAGE_PASSWORD")
+AWS_STORAGE_BUCKET_NAME = env("BUNNY_STORAGE_ZONE")  
+AWS_S3_ENDPOINT_URL = env("BUNNY_STORAGE_ENDPOINT")  
+
+# Public CDN URL (this is what API returns)
+BUNNY_CDN_URL = env("BUNNY_CDN_URL")
+MEDIA_URL = f"{BUNNY_CDN_URL}/"
 
 # CORS settings
 

@@ -106,7 +106,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """For viewing profile info"""
     class Meta:
         model = User
-        fields = ['username', 'email', 'about', 'account_type', 'profile_picture']  # Removed details here
+        fields = ['username', 'email', 'about', 'account_type', 'profile_picture']  
         read_only_fields = ['email', 'account_type']
 
 # Update user profile fields
