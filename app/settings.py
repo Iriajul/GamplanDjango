@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 import environ
-import dj_database_url 
+import dj_database_url
 
 # Initialize environ
 env = environ.Env(
@@ -18,9 +18,6 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ["*"]
 
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
-
 # Installed apps
 INSTALLED_APPS = [
     "jazzmin",
@@ -31,10 +28,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'corsheaders',  # Added corsheaders here
-    'storages',  # For BunnyCDN storage
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+
+    # Cloudinary apps
+    'cloudinary',
+    'cloudinary_storage',
+
+    # Your apps
     'users',
     'plans',
     'classes',
@@ -48,10 +49,10 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Added cors middleware here
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',  # Must be after cors middleware
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -68,7 +69,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
-# Root URLs and WSGI
 ROOT_URLCONF = 'app.urls'
 WSGI_APPLICATION = 'app.wsgi.application'
 
@@ -90,25 +90,6 @@ TEMPLATES = [
 ]
 
 # Database
-# DATABASES = {
-#     'default': {
-#         'ENGINE': env('DB_ENGINE'),
-#         'NAME': env('DB_NAME'),
-#         'USER': env('DB_USER'),
-#         'PASSWORD': env('DB_PASSWORD'),
-#         'HOST': env('DB_HOST'),
-#         'PORT': env('DB_PORT'),
-#         'OPTIONS': {
-#             'options': '-c search_path=django'
-#         }
-#     }
-# }
-
-# Login / Logout redirects (for session-based login)
-LOGIN_REDIRECT_URL = env('FRONTEND_DOMAIN') + "/login"
-LOGOUT_REDIRECT_URL = env('FRONTEND_DOMAIN') + "/login"
-
-
 DATABASES = {
     'default': dj_database_url.config(
         default='postgresql://game_ob55_user:TV7YOJcvQurBCRRLRqlm2x3F5CJHX79x@dpg-d2dpvvbuibrs73afvrp0-a.oregon-postgres.render.com/game_ob55',
@@ -116,7 +97,6 @@ DATABASES = {
         ssl_require=True
     )
 }
-
 
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
@@ -172,23 +152,21 @@ BACKEND_DOMAIN = env('BACKEND_DOMAIN')
 GOOGLE_API_KEY = env('GOOGLE_API_KEY')
 TAVILY_API_KEY = env('TAVILY_API_KEY')
 
-# BunnyCDN Storage
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-AWS_ACCESS_KEY_ID = env("BUNNY_STORAGE_USERNAME")  
-AWS_SECRET_ACCESS_KEY = env("BUNNY_STORAGE_PASSWORD")
-AWS_STORAGE_BUCKET_NAME = env("BUNNY_STORAGE_ZONE")  
-AWS_S3_ENDPOINT_URL = env("BUNNY_STORAGE_ENDPOINT")  
-
-# Public CDN URL (this is what API returns)
-BUNNY_CDN_URL = env("BUNNY_CDN_URL")
-MEDIA_URL = f"{BUNNY_CDN_URL}/"
-
 # CORS settings
-
 CORS_ALLOWED_ORIGINS = [
     "https://gameplan-demo.vercel.app",
     "http://localhost:3000",
 ]
-
 CORS_ALLOW_CREDENTIALS = True
+
+# =========================
+# Cloudinary Settings
+# =========================
+# Load from .env
+CLOUDINARY_URL = env('CLOUDINARY_URL')  # Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+
+# Use Cloudinary for all uploaded media
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# When using Cloudinary, MEDIA_URL should be blank so Cloudinary generates full URLs
+MEDIA_URL = ''

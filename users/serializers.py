@@ -28,6 +28,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
         validated_data.pop('agree_terms')
         return User.objects.create_user(**validated_data)
 
+
 # Request OTP for password reset
 class ForgotPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -54,6 +55,7 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
         )
         return code
 
+
 # Verify the OTP code
 class ForgotPasswordVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
@@ -70,6 +72,7 @@ class ForgotPasswordVerifySerializer(serializers.Serializer):
         # Store the email in the context (view will put it into a cookie)
         self.context['verified_email'] = user.email
         return data
+
 
 # Set new password after OTP verification
 class SetNewPasswordSerializer(serializers.Serializer):
@@ -100,10 +103,11 @@ class SetNewPasswordSerializer(serializers.Serializer):
         user.reset_code_created = None
         user.save()
         return user
-    
+
+
 # User profile serializers    
 class UserProfileSerializer(serializers.ModelSerializer):
-    """For viewing profile info with full CDN URL"""
+    """For viewing profile info with full Cloudinary URL"""
     profile_picture = serializers.SerializerMethodField()
 
     class Meta:
@@ -113,10 +117,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_profile_picture(self, obj):
         if obj.profile_picture:
-            # Prepend BunnyCDN URL
-            return f"{settings.BUNNY_CDN_URL}/{obj.profile_picture}"
+            return obj.profile_picture.url  # Cloudinary gives full URL
         return None
-    
+
+
 # Serializer for updating about and details fields
 class AboutDetailsSerializer(serializers.ModelSerializer):
     """For popup about/details editing only"""
@@ -127,6 +131,7 @@ class AboutDetailsSerializer(serializers.ModelSerializer):
             'about': {'required': False},
             'details': {'required': False},
         }
+
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     """For updating profile fields"""
@@ -139,9 +144,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'profile_picture': {'required': False},
         }
     
-    # Prepend BunnyCDN URL when updating profile_picture
+    # Use Cloudinary URL in response
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.profile_picture:
-            data['profile_picture'] = f"{settings.BUNNY_CDN_URL}/{instance.profile_picture}"
-        return data        
+            data['profile_picture'] = instance.profile_picture.url
+        return data
