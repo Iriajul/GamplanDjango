@@ -3,29 +3,22 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 import dj_database_url
-import cloudinary
-import cloudinary_storage
 
-# =========================
 # Initialize environ
-# =========================
 env = environ.Env(
     DEBUG=(bool, False)
 )
 
+# Set base directory and load .env
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# =========================
 # Core settings
-# =========================
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ["*"]
 
-# =========================
 # Installed apps
-# =========================
 INSTALLED_APPS = [
     "jazzmin",
     'django.contrib.admin',
@@ -49,9 +42,12 @@ INSTALLED_APPS = [
     'payments',
 ]
 
-# =========================
+CSRF_TRUSTED_ORIGINS = [
+    "https://gamplandjango-2.onrender.com",
+    "https://gameplan-demo.vercel.app"
+]
+
 # Middleware
-# =========================
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -63,9 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# =========================
 # JWT config
-# =========================
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.int('ACCESS_TOKEN_EXPIRE_MINUTES')),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
@@ -75,15 +69,10 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
-# =========================
-# URLs & WSGI
-# =========================
 ROOT_URLCONF = 'app.urls'
 WSGI_APPLICATION = 'app.wsgi.application'
 
-# =========================
 # Templates
-# =========================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -100,50 +89,38 @@ TEMPLATES = [
     },
 ]
 
-# =========================
 # Database
-# =========================
 DATABASES = {
     'default': dj_database_url.config(
-        default=env('db_url'),
+        default='postgresql://game_ob55_user:TV7YOJcvQurBCRRLRqlm2x3F5CJHX79x@dpg-d2dpvvbuibrs73afvrp0-a.oregon-postgres.render.com/game_ob55',
         conn_max_age=600,
         ssl_require=True
     )
 }
 
-# =========================
 # Custom user model
-# =========================
 AUTH_USER_MODEL = 'users.User'
 
-# =========================
 # Localization
-# =========================
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Dhaka'
 USE_I18N = True
 USE_TZ = True
 
-# =========================
 # Static files
-# =========================
 STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# =========================
 # Django REST Framework
-# =========================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+    'PAGE_SIZE': 5,  
 }
 
-# =========================
 # Email settings
-# =========================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = env.int('EMAIL_PORT')
@@ -152,9 +129,7 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
-# =========================
 # OAuth credentials
-# =========================
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
 FACEBOOK_CLIENT_ID = env('FACEBOOK_CLIENT_ID')
@@ -162,43 +137,36 @@ FACEBOOK_CLIENT_SECRET = env('FACEBOOK_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI = env('GOOGLE_REDIRECT_URI')
 FACEBOOK_REDIRECT_URI = env('FACEBOOK_REDIRECT_URI')
 
-# =========================
 # Stripe
-# =========================
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 STRIPE_PRICE_MONTHLY = env('STRIPE_PRICE_MONTHLY')
 STRIPE_PRICE_YEARLY = env('STRIPE_PRICE_YEARLY')
 
-# =========================
 # Domains
-# =========================
 FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
 BACKEND_DOMAIN = env('BACKEND_DOMAIN')
 
-# =========================
 # External APIs
-# =========================
 GOOGLE_API_KEY = env('GOOGLE_API_KEY')
 TAVILY_API_KEY = env('TAVILY_API_KEY')
 
-# =========================
 # CORS settings
-# =========================
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_DOMAIN,
+    "https://gameplan-demo.vercel.app",
     "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 # =========================
-# Cloudinary configuration
+# Cloudinary Settings
 # =========================
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUDINARY_URL').split('@')[1],
-    'API_KEY': env('CLOUDINARY_URL').split('://')[1].split(':')[0],
-    'API_SECRET': env('CLOUDINARY_URL').split(':')[1].split('@')[0],
-}
+# Load from .env
+CLOUDINARY_URL = env('CLOUDINARY_URL')  # Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+
+# Use Cloudinary for all uploaded media
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-MEDIA_URL = '/media/'  # Cloudinary will generate full URLs
+
+# When using Cloudinary, MEDIA_URL should be blank so Cloudinary generates full URLs
+MEDIA_URL = '/media/'
