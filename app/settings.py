@@ -162,11 +162,10 @@ CORS_ALLOW_CREDENTIALS = True
 # =========================
 # Cloudinary Settings
 # =========================
-# Load from .env
-CLOUDINARY_URL = env('CLOUDINARY_URL')  # Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-
-# Use Cloudinary for all uploaded media
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# When using Cloudinary, MEDIA_URL should be blank so Cloudinary generates full URLs
-MEDIA_URL = '/media/'
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
