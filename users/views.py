@@ -139,14 +139,18 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
+        # DRF automatically handles request.FILES when passed via request.data
         serializer = UserUpdateSerializer(
-            request.user, data=request.data, partial=True
+            request.user,
+            data=request.data,
+            partial=True  # allow partial updates
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 # About/Details update
 class AboutDetailsUpdateView(APIView):
     permission_classes = [IsAuthenticated]

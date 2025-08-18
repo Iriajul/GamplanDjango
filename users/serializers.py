@@ -5,8 +5,13 @@ from datetime import timedelta
 import random
 from django.core.mail import send_mail
 from django.conf import settings
+from cloudinary import CloudinaryImage
+from cloudinary.uploader import upload as cloudinary_upload
 
-# Serializers for user registration and password reset functionalities
+
+# -----------------------------
+# User Signup Serializer
+# -----------------------------
 class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
@@ -29,7 +34,9 @@ class UserSignupSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-# Request OTP for password reset
+# -----------------------------
+# Forgot Password Request
+# -----------------------------
 class ForgotPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -56,7 +63,9 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
         return code
 
 
-# Verify the OTP code
+# -----------------------------
+# Verify OTP Code
+# -----------------------------
 class ForgotPasswordVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
 
@@ -69,12 +78,13 @@ class ForgotPasswordVerifySerializer(serializers.Serializer):
         if user.reset_code_created and timezone.now() > user.reset_code_created + timedelta(minutes=10):
             raise serializers.ValidationError("The reset code has expired. Please request a new one.")
 
-        # Store the email in the context (view will put it into a cookie)
         self.context['verified_email'] = user.email
         return data
 
 
-# Set new password after OTP verification
+# -----------------------------
+# Set New Password
+# -----------------------------
 class SetNewPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
@@ -105,25 +115,31 @@ class SetNewPasswordSerializer(serializers.Serializer):
         return user
 
 
-# User profile serializers    
+
+# -----------------------------
+# User Profile Serializer
+# -----------------------------
 class UserProfileSerializer(serializers.ModelSerializer):
-    """For viewing profile info with full Cloudinary URL"""
     profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'about', 'account_type', 'profile_picture']  
+        fields = ['username', 'email', 'about', 'account_type', 'profile_picture']
         read_only_fields = ['email', 'account_type']
 
     def get_profile_picture(self, obj):
         if obj.profile_picture:
-            return obj.profile_picture.url  # Cloudinary gives full URL
+            public_id = str(obj.profile_picture)  # Ensure string
+            if public_id.startswith("http"):
+                return public_id
+            return CloudinaryImage(public_id).build_url(secure=True)
         return None
 
 
-# Serializer for updating about and details fields
+# -----------------------------
+# About / Details Serializer
+# -----------------------------
 class AboutDetailsSerializer(serializers.ModelSerializer):
-    """For popup about/details editing only"""
     class Meta:
         model = User
         fields = ['about', 'details']
@@ -133,8 +149,12 @@ class AboutDetailsSerializer(serializers.ModelSerializer):
         }
 
 
+# -----------------------------
+# User Update Serializer (Cloudinary)
+# -----------------------------
 class UserUpdateSerializer(serializers.ModelSerializer):
-    """For updating profile fields"""
+    profile_picture = serializers.ImageField(required=False)
+
     class Meta:
         model = User
         fields = ['username', 'about', 'profile_picture']
@@ -143,10 +163,33 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'about': {'required': False},
             'profile_picture': {'required': False},
         }
-    
-    # Use Cloudinary URL in response
+
+    def update(self, instance, validated_data):
+        profile_file = validated_data.pop('profile_picture', None)
+
+        # Upload to Cloudinary if provided
+        if profile_file:
+            upload_result = cloudinary_upload(
+                profile_file,
+                folder="profile_pics",
+                public_id=f"user_{instance.id}",
+                overwrite=True,
+                resource_type="image"
+            )
+            instance.profile_picture = upload_result['public_id']  # store public_id in DB
+
+        # Update other fields
+        instance.username = validated_data.get('username', instance.username)
+        instance.about = validated_data.get('about', instance.about)
+        instance.save()
+        return instance
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.profile_picture:
-            data['profile_picture'] = instance.profile_picture.url
+            public_id = str(instance.profile_picture)
+            if public_id.startswith("http"):
+                data['profile_picture'] = public_id
+            else:
+                data['profile_picture'] = CloudinaryImage(public_id).build_url(secure=True)
         return data
